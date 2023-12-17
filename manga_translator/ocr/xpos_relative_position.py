@@ -6,6 +6,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+
 def fixed_pos_embedding(x):
     seq_len, dim = x.shape
     inv_freq = 1.0 / (10000 ** (torch.arange(0, dim) / dim))
@@ -14,11 +15,13 @@ def fixed_pos_embedding(x):
     )
     return torch.sin(sinusoid_inp), torch.cos(sinusoid_inp)
 
+
 def rotate_every_two(x):
     x1 = x[:, :, ::2]
     x2 = x[:, :, 1::2]
     x = torch.stack((-x2, x1), dim=-1)
     return x.flatten(-2)  # in einsum notation: rearrange(x, '... d j -> ... (d j)')\
+
 
 def duplicate_interleave(m):
     """
@@ -30,10 +33,12 @@ def duplicate_interleave(m):
     m = m.view(dim0, -1)  # reshape into a matrix, interleaving the copy
     return m
 
+
 def apply_rotary_pos_emb(x, sin, cos, scale=1):
     sin, cos = map(lambda t: duplicate_interleave(t * scale), (sin, cos))
     # einsum notation for lambda t: repeat(t[offset:x.shape[1]+offset,:], "n d -> () n () (d j)", j=2)
     return (x * cos) + (rotate_every_two(x) * sin)
+
 
 def apply_rotary_pos_emb2d(x, sin, cos, scale=1):
     breakpoint()
@@ -41,9 +46,10 @@ def apply_rotary_pos_emb2d(x, sin, cos, scale=1):
     # einsum notation for lambda t: repeat(t[offset:x.shape[1]+offset,:], "n d -> () n () (d j)", j=2)
     return (x * cos) + (rotate_every_two(x) * sin)
 
+
 class XPOS(nn.Module):
     def __init__(
-        self, head_dim, scale_base=512
+            self, head_dim, scale_base=512
     ):
         super().__init__()
         self.head_dim = head_dim
@@ -63,7 +69,7 @@ class XPOS(nn.Module):
             scale = scale[-length:]
             sin = sin[-length:]
             cos = cos[-length:]
-        
+
         if downscale:
             scale = 1 / scale
 
@@ -73,31 +79,33 @@ class XPOS(nn.Module):
 
 class XPOS2D(nn.Module):
     def __init__(
-        self, head_dim, scale_base=512
+            self, head_dim, scale_base=512
     ):
         super().__init__()
         self.xpos = XPOS(head_dim // 2, scale_base)
 
-    def forward(self, x: torch.Tensor, offset_x = 0, offset_y = 0, downscale=False):
+    def forward(self, x: torch.Tensor, offset_x=0, offset_y=0, downscale=False):
         """
             x: N, H, W, C
         """
         N, H, W, C = x.shape
         C = C // 2
-        [dir_x, dir_y] = x.chunk(2, dim = 3)
-        dir_x = einops.rearrange(dir_x, 'N H W C -> (N H) W C', N = N, H = H, W = W, C = C)
-        dir_y = einops.rearrange(dir_y, 'N H W C -> (N W) H C', N = N, H = H, W = W, C = C)
-        dir_x = self.xpos(dir_x, offset = offset_x, downscale = downscale)
-        dir_y = self.xpos(dir_y, offset = offset_y, downscale = downscale)
-        dir_x = einops.rearrange(dir_x, '(N H) W C -> N H W C', N = N, H = H, W = W, C = C)
-        dir_y = einops.rearrange(dir_y, '(N W) H C -> N H W C', N = N, H = H, W = W, C = C)
-        return torch.cat([dir_x, dir_y], dim = 3)
+        [dir_x, dir_y] = x.chunk(2, dim=3)
+        dir_x = einops.rearrange(dir_x, 'N H W C -> (N H) W C', N=N, H=H, W=W, C=C)
+        dir_y = einops.rearrange(dir_y, 'N H W C -> (N W) H C', N=N, H=H, W=W, C=C)
+        dir_x = self.xpos(dir_x, offset=offset_x, downscale=downscale)
+        dir_y = self.xpos(dir_y, offset=offset_y, downscale=downscale)
+        dir_x = einops.rearrange(dir_x, '(N H) W C -> N H W C', N=N, H=H, W=W, C=C)
+        dir_y = einops.rearrange(dir_y, '(N W) H C -> N H W C', N=N, H=H, W=W, C=C)
+        return torch.cat([dir_x, dir_y], dim=3)
 
-def test() :
+
+def test():
     e = XPOS2D(64, 512)
     x = torch.randn(8, 10, 10, 64)
     o = e(x)
     print(o.shape)
 
-if __name__ == '__main__' :
+
+if __name__ == '__main__':
     test()

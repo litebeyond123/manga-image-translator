@@ -14,6 +14,8 @@ from .m2m100 import M2M100Translator, M2M100BigTranslator
 from .selective import SelectiveOfflineTranslator, prepare as prepare_selective_translator
 from .none import NoneTranslator
 from .original import OriginalTranslator
+from .ocrtext import OCRTextTranslator
+from .readfromdatanew import ReadTextTranslator
 
 OFFLINE_TRANSLATORS = {
     'offline': SelectiveOfflineTranslator,
@@ -38,6 +40,8 @@ TRANSLATORS = {
     'gpt4': GPT4Translator,
     'none': NoneTranslator,
     'original': OriginalTranslator,
+    'ocrtext': OCRTextTranslator,
+    'readfromdatanew': ReadTextTranslator,
     **OFFLINE_TRANSLATORS,
 }
 translator_cache = {}
