@@ -26,11 +26,21 @@ class ReadTextTranslator(CommonTranslator):
         'RUS': 'ru',
         'ESP': 'spa',
     }
-
+    # New class attribute for counting calls
+    _translate_call_count = 0
     def __init__(self) -> None:
         super().__init__()
 
     async def _translate(self, from_lang, to_lang, queries):
+        # 检查 queries 中是否包含 'coords:'
+        skip_translation = any('coords:' in query for query in queries)
+        if skip_translation:
+            print("Skipping translation because 'coords:' was found in queries.")
+            return []
+        # 打印 queries 的值
+        print("----- Queries Value -----")
+        print(queries)
+        print("-------------------------")
         # Create a connection and open the database
         conn = sqlite3.connect('manga_page.db')
 
@@ -66,8 +76,6 @@ class ReadTextTranslator(CommonTranslator):
             last_string = result_list[-1] + new_end
             result_list[-1] = last_string
 
-        # create form
-        # cursor.execute('''CREATE TABLE manga_page(id INTEGER PRIMARY KEY AUTOINCREMENT, words TEXT, trans TEXT)''')
 
         # Update page field value
         new_page = page + 1
