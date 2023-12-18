@@ -126,7 +126,7 @@ def your_chatgpt_api_call(conn, input_text):
     input_text = input_text.replace("\"", " ")
 
     print("Convert to JSON format：")
-    pages = re.findall(r'@Page (\d+)，(\d+) sentences in total\.(.*?)@Page \1 End', input_text, re.DOTALL)
+    pages = re.findall(r'@Page (\d+), (\d+) sentences in total\.(.*?)@Page \1 End', input_text, re.DOTALL)
 
     # get summary
     cur = conn.cursor()
