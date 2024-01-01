@@ -39,4 +39,3 @@ share/python-wheels/
 *.egg
 MANIFEST
 .history
-/continue.bat

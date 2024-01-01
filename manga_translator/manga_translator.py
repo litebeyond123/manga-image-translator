@@ -219,7 +219,7 @@ class MangaTranslator():
 
     async def _translate_file(self, path: str, dest: str, ctx: Context):
         if path.endswith('.txt'):
-            with open(path, 'r', encoding='utf-8') as f:
+            with open(path, 'r') as f:
                 queries = f.read().split('\n')
             translated_sentences = \
                 await dispatch_translation(ctx.translator, queries, ctx.use_mtpe, ctx,
