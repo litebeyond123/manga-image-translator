@@ -189,8 +189,7 @@ def your_chatgpt_api_call(conn, input_text):
                 # model='gpt-3.5-turbo-16k',
                 model='gpt-4-1106-preview ',
                 messages=[
-                    {"role": "system",
-                     "content": "You're a master comic book writer, translate json text to Chinese, Output only plain text. Do not output markdown."},
+                    {"role": "system", "content": "You're a master comic book writer, translate json text to Chinese, Output only plain text. Do not output markdown."},
                     {"role": "user", "content": prompt},
                     {"role": "user", "content": summary},
                     {"role": "user", "content": json.dumps(json_obj, ensure_ascii=False, indent=2)}
