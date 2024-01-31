@@ -37,10 +37,6 @@ class OCRTextTranslator(CommonTranslator):
         if skip_translation:
             print("Skipping translation because 'coords:' was found in queries.")
             return []
-        # 打印 queries 的值
-        print("----- Queries Value -----")
-        print(queries)
-        print("-------------------------")
         # Create a connection and open the database
         conn = sqlite3.connect('manga_page.db')
 

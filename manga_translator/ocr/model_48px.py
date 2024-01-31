@@ -255,6 +255,7 @@ class ConvNext_FeatureExtractor(nn.Module) :
         # h//16, w//4
         x = self.block4(x)
         x = self.down4(x)
+        print("After stem:", x.shape)
         return x
 
 def transformer_encoder_forward(

@@ -4,6 +4,7 @@ import numpy as np
 import torch
 import cv2
 import einops
+import json
 from typing import List, Tuple
 
 from .default_utils.DBNet_resnet34 import TextDetection as TextDetectionDefault
@@ -87,6 +88,7 @@ class DefaultDetector(OfflineDetector):
 
         textlines = [Quadrilateral(pts.astype(int), '', score) for pts, score in zip(polys, scores)]
         textlines = list(filter(lambda q: q.area > 16, textlines))
+
         mask_resized = cv2.resize(mask, (mask.shape[1] * 2, mask.shape[0] * 2), interpolation=cv2.INTER_LINEAR)
         if pad_h > 0:
             mask_resized = mask_resized[:-pad_h, :]

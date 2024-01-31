@@ -350,11 +350,16 @@ class Quadrilateral(object):
     """
     Helper for storing textlines that contains various helper functions.
     """
+    _current_line = 0  # 类变量，用于跟踪当前读取到文件中的哪一行
     def __init__(self, pts: np.ndarray, text: str, prob: float, fg_r: int = 0, fg_g: int = 0, fg_b: int = 0, bg_r: int = 0, bg_g: int = 0, bg_b: int = 0):
         self.pts = pts
+        # self.pts = self._read_and_parse_bounding_boxes()
+        # print("Creating Quadrilateral with points1:", self.pts)
         # Sort coordinates to start at the top left and go clockwise
         self.pts = self.pts[np.argsort(self.pts[:,1])]
+        # print("Creating Quadrilateral with points2:", self.pts)
         self.pts = self.pts[[*np.argsort(self.pts[:2,0]), *np.argsort(self.pts[2:,0])[::-1] + 2]]
+        # print("Creating Quadrilateral with points3:", self.pts)
 
         self.text = text
         self.prob = prob
@@ -366,6 +371,24 @@ class Quadrilateral(object):
         self.bg_b = bg_b
         self.assigned_direction: str = None
         self.textlines: List[Quadrilateral] = []
+
+    # def _read_and_parse_bounding_boxes(self):
+    #     with open('test.txt', 'r', encoding='utf-8') as file:
+    #         data = json.load(file)
+    #         lines = data['Result']['regions'][0]['lines']
+    #
+    #         if Quadrilateral._current_line >= len(lines):
+    #             # 重置行号，或者可以选择抛出错误
+    #             Quadrilateral._current_line = 0
+    #
+    #         bbox_data = lines[Quadrilateral._current_line]['words'][0]['boundingBox']
+    #         Quadrilateral._current_line += 1  # 更新行号
+    #         coords = list(map(int, bbox_data.split(',')))
+    #         return np.array(coords).reshape(-1, 2)
+    #
+    # def _sort_pts(self):
+    #     self.pts = self.pts[np.argsort(self.pts[:, 1])]
+    #     self.pts = self.pts[[*np.argsort(self.pts[:2, 0]), *np.argsort(self.pts[2:, 0])[::-1] + 2]]
 
     @functools.cached_property
     def structure(self) -> List[np.ndarray]:
@@ -585,6 +608,7 @@ class Quadrilateral(object):
 
     def copy(self, new_pts: np.ndarray):
         return Quadrilateral(new_pts, self.text, self.prob, *self.fg_colors, *self.bg_colors)
+
 
 # def merge_quadrilaterals(q1: Quadrilateral, q2: Quadrilateral):
 #     min_rect = np.array(Polygon([*q1.pts, *q2.pts]).minimum_rotated_rectangle.exterior.coords[:4])

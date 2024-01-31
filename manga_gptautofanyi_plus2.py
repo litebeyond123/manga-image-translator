@@ -187,9 +187,10 @@ def your_chatgpt_api_call(conn, input_text):
             response = openai.ChatCompletion.create(
 
                 # model='gpt-3.5-turbo-16k',
-                model='gpt-4-32k',
+                model='gpt-4-1106-preview ',
                 messages=[
-                    {"role": "system", "content": "You're a master comic book writer, translate json text to Chinese, Output only plain text. Do not output markdown."},
+                    {"role": "system",
+                     "content": "You're a master comic book writer, translate json text to Chinese, Output only plain text. Do not output markdown."},
                     {"role": "user", "content": prompt},
                     {"role": "user", "content": summary},
                     {"role": "user", "content": json.dumps(json_obj, ensure_ascii=False, indent=2)}
@@ -218,7 +219,8 @@ def remove_invalid_comma(json_string):
     # Remove extra commas in an array
     # json_string = re.sub(r',\s*]', ']', json_string)
     return json_string
-    
+
+
 def get_translation(conn, input_text):
     # Call your ChatGPT 3.5 API here and get the response
     response = your_chatgpt_api_call(conn, input_text)

@@ -305,7 +305,7 @@ class GPT4Translator(GPT35TurboTranslator):
             messages.insert(2, {'role': 'assistant', 'content': self._CHAT_SAMPLE[to_lang][1]})
 
         response = await openai.ChatCompletion.acreate(
-            model='gpt-4-0613',
+            model='gpt-4-32k-0314',
             messages=messages,
             max_tokens=self._MAX_TOKENS // 2,
             temperature=self.temperature,
